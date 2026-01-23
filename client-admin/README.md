@@ -1,16 +1,39 @@
-# React + Vite
+# Client Admin – MERN Stack (Lab)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the **admin frontend** of the MERN Stack project.
+It is built with **React** and is used to manage categories (CRUD) in the system.
 
-Currently, two official plugins are available:
+## 📂 Folder Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+src/
+├── components/
+│   ├── MainComponent.jsx
+│   ├── MenuComponent.jsx
+│   ├── CategoryComponent.jsx
+│   └── CategoryDetailComponent.jsx
+├── contexts/
+│   └── MyContext.js
+└── App.js
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Admin login with JWT authentication
+- View category list
+- Add new category
+- Update existing category
+- Delete category
+- Call backend APIs using Axios
 
-## Expanding the ESLint configuration
+## 🛠 Technologies Used
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React (Class Components)
+- React Router DOM
+- Axios
+- Context API
+- JWT (via backend)
+
+## ▶️ How to Run
+
+1. Install dependencies:
+   ```bash
+   npm install

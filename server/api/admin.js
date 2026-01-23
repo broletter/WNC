@@ -31,9 +31,20 @@ router.get('/token', JwtUtil.checkToken, function (req, res) {
         token: token });
 });
 router.get('/categories', JwtUtil.checkToken, async function (req, res) {
+    const categories = await CategoryDAO.selectAll();
+    res.json(categories);
+});
+router.post('/categories', JwtUtil.checkToken, async function (req, res) {
     const name = req.body.name;
     const category = { name: name };
     const result = await CategoryDAO.insert(category);
+    res.json(result);
+});
+router.put('/categories/:id', JwtUtil.checkToken, async function (req, res) {
+    const _id = req.params.id;
+    const name = req.body.name;
+    const category = { _id: _id, name: name };
+    const result = await CategoryDAO.update(category);
     res.json(result);
 });
 router.delete('/categories/:id', JwtUtil.checkToken, async function (req, res) {
