@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const JwtUtil = require('../utils/JwtUtil');
 const AdminDAO = require('../models/AdminDAO');
+const CategoryDAO = require('../models/CategoryDAO');
 router.post('/login', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -28,5 +29,16 @@ router.get('/token', JwtUtil.checkToken, function (req, res) {
         success: true, 
         message: 'Token is valid', 
         token: token });
+});
+router.get('/categories', JwtUtil.checkToken, async function (req, res) {
+    const name = req.body.name;
+    const category = { name: name };
+    const result = await CategoryDAO.insert(category);
+    res.json(result);
+});
+router.delete('/categories/:id', JwtUtil.checkToken, async function (req, res) {
+    const _id = req.params.id;
+    const result = await CategoryDAO.delete(_id);
+    res.json(result);
 });
 module.exports = router;
