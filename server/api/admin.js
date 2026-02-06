@@ -1,55 +1,138 @@
 const express = require('express');
 const router = express.Router();
+
 const JwtUtil = require('../utils/JwtUtil');
 const AdminDAO = require('../models/AdminDAO');
 const CategoryDAO = require('../models/CategoryDAO');
+const ProductDAO = require('../models/ProductDAO');
+
+// ===================== LOGIN =====================
 router.post('/login', async (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
-    if (username && password) {
-        const admin = await AdminDAO.selectByUsernameAndPassword(username, password);
-        if (admin) {
-            const token = JwtUtil.genToken(username, password);
-            res.json({ 
-                success: true, 
-                message: 'Authentication successful', 
-                token: token });
-        } else {
-            res.json({ 
-                success: false, 
-                message: 'Incorrect username or password'});
-        }
+  const { username, password } = req.body;
+
+  if (username && password) {
+    const admin = await AdminDAO.selectByUsernameAndPassword(
+      username,
+      password
+    );
+
+    if (admin) {
+      const token = JwtUtil.genToken(username, password);
+      res.json({
+        success: true,
+        message: 'Authentication successful',
+        token: token
+      });
     } else {
-        res.json({ success: false, message: 'Please input username and password' });
+      res.json({
+        success: false,
+        message: 'Incorrect username or password'
+      });
     }
-});
-router.get('/token', JwtUtil.checkToken, function (req, res) {
-    const token = req.headers ['x-access-token'] || req.headers ['authorization'];
+  } else {
     res.json({
-        success: true, 
-        message: 'Token is valid', 
-        token: token });
+      success: false,
+      message: 'Please input username and password'
+    });
+  }
 });
-router.get('/categories', JwtUtil.checkToken, async function (req, res) {
-    const categories = await CategoryDAO.selectAll();
-    res.json(categories);
+
+// ===================== TOKEN =====================
+router.get('/token', JwtUtil.checkToken, (req, res) => {
+  const token =
+    req.headers['x-access-token'] || req.headers['authorization'];
+
+  res.json({
+    success: true,
+    message: 'Token is valid',
+    token: token
+  });
 });
-router.post('/categories', JwtUtil.checkToken, async function (req, res) {
-    const name = req.body.name;
-    const category = { name: name };
-    const result = await CategoryDAO.insert(category);
-    res.json(result);
+
+// ===================== CATEGORY =====================
+router.get('/categories', JwtUtil.checkToken, async (req, res) => {
+  const categories = await CategoryDAO.selectAll();
+  res.json(categories);
 });
-router.put('/categories/:id', JwtUtil.checkToken, async function (req, res) {
-    const _id = req.params.id;
-    const name = req.body.name;
-    const category = { _id: _id, name: name };
-    const result = await CategoryDAO.update(category);
-    res.json(result);
+
+router.post('/categories', JwtUtil.checkToken, async (req, res) => {
+  const category = { name: req.body.name };
+  const result = await CategoryDAO.insert(category);
+  res.json(result);
 });
-router.delete('/categories/:id', JwtUtil.checkToken, async function (req, res) {
-    const _id = req.params.id;
-    const result = await CategoryDAO.delete(_id);
-    res.json(result);
+
+router.put('/categories/:id', JwtUtil.checkToken, async (req, res) => {
+  const category = {
+    _id: req.params.id,
+    name: req.body.name
+  };
+  const result = await CategoryDAO.update(category);
+  res.json(result);
 });
+
+router.delete('/categories/:id', JwtUtil.checkToken, async (req, res) => {
+  const result = await CategoryDAO.delete(req.params.id);
+  res.json(result);
+});
+
+// ===================== PRODUCT =====================
+router.get('/products', JwtUtil.checkToken, async (req, res) => {
+  let products = await ProductDAO.selectAll();
+
+  const sizePage = 4;
+  const noPages = Math.ceil(products.length / sizePage);
+
+  let curPage = req.query.page ? parseInt(req.query.page) : 1;
+  const offset = (curPage - 1) * sizePage;
+
+  products = products.slice(offset, offset + sizePage);
+
+  res.json({
+    products: products,
+    noPages: noPages,
+    curPage: curPage
+  });
+});
+
+router.post('/products', JwtUtil.checkToken, async (req, res) => {
+  const { name, price, category: cid, image } = req.body;
+  const now = new Date().getTime();
+
+  const category = await CategoryDAO.selectByID(cid);
+
+  const product = {
+    name: name,
+    price: price,
+    image: image,
+    cdate: now,
+    category: category
+  };
+
+  const result = await ProductDAO.insert(product);
+  res.json(result);
+});
+
+router.put('/products/:id', JwtUtil.checkToken, async (req, res) => {
+  const { name, price, category: cid, image } = req.body;
+  const _id = req.params.id;
+
+  const category = await CategoryDAO.selectByID(cid);
+
+  const product = {
+    _id: _id,
+    name: name,
+    price: price,
+    image: image,
+    category: category
+  };
+
+  const result = await ProductDAO.update(product);
+  res.json(result);
+});
+
+router.delete('/products/:id', JwtUtil.checkToken, async (req, res) => {
+  const result = await ProductDAO.delete(req.params.id);
+  res.json(result);
+});
+
 module.exports = router;

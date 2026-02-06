@@ -13,6 +13,7 @@ src/
 │   └── CategoryDetailComponent.jsx
 ├── contexts/
 │   └── MyContext.js
+│   └── MyProvider.js
 └── App.js
 
 ## ✨ Features

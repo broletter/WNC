@@ -15,12 +15,12 @@ class Login extends Component {
   }
 
   render() {
-    // ✅ ĐÃ LOGIN → CHUYỂN TRANG
+    // ĐÃ LOGIN → CHUYỂN TRANG
     if (this.context.token !== '') {
       return <Navigate to="/admin/home" replace />;
     }
 
-    // ❌ CHƯA LOGIN → FORM
+    // CHƯA LOGIN → FORM
     return (
       <div className="align-valign-center">
         <h2 className="text-center">ADMIN LOGIN</h2>

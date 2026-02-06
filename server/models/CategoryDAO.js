@@ -17,22 +17,27 @@ const CategoryDAO = {
         return result;
     },
 
-    // UPDATE  ✅ (BẠN ĐANG THIẾU)
+    // UPDATE  
     async update(category) {
         const newvalues = { name: category.name };
         const result = await Models.Category.findByIdAndUpdate(
             category._id,
             newvalues,
-            { new: true }   // 🔥 bắt buộc
+            { new: true }   
         );
         return result;
     },
 
-    // DELETE ✅ (Mongoose 6+)
+    // DELETE 
     async delete(_id) {
         const result = await Models.Category.findOneAndDelete({ _id });
         return result;
+    },
+    async selectByID(_id) {
+    const category = await Models.Category.findById(_id).exec();
+    return category;
     }
+
 };
 
 module.exports = CategoryDAO;
