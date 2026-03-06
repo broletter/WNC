@@ -16,6 +16,55 @@ const ProductDAO = {
     return product;
   },
 
+  // lấy top product mới
+  async selectTopNew(top) {
+    const query = {};
+    const mysort = { cdate: -1 }; // descending
+    const products = await Models.Product
+      .find(query)
+      .sort(mysort)
+      .limit(top)
+      .exec();
+    return products;
+  },
+
+  // lấy top product bán chạy
+  async selectTopHot(top) {
+    const items = await Models.Order.aggregate([
+      { $match: { status: 'APPROVED' } },
+      { $unwind: '$items' },
+      {
+        $group: {
+          _id: '$items.product._id',
+          sum: { $sum: '$items.quantity' }
+        }
+      },
+      { $sort: { sum: -1 } }, 
+      { $limit: top }
+    ]).exec();
+
+    var products = [];
+    for (const item of items) {
+      const product = await ProductDAO.selectByID(item._id);
+      products.push(product);
+    }
+    return products;
+  },
+
+  // lấy product theo category id
+  async selectByCatID(_cid) {
+    const query = { 'category._id': _cid };
+    const products = await Models.Product.find(query).exec();
+    return products;
+  },
+
+  // tìm product theo keyword
+  async selectByKeyword(keyword) {
+    const query = { name: { $regex: new RegExp(keyword, "i") } };
+    const products = await Models.Product.find(query).exec();
+    return products;
+  },
+  
   // thêm product mới
   async insert(product) {
     const mongoose = require('mongoose');
