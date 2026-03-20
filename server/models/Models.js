@@ -9,7 +9,6 @@ const CategorySchema = mongoose.Schema({
     name: String,
 }, {versionKey: false}); 
 const CustomerSchema = mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,
     username: String,
     password: String,
     name: String,
