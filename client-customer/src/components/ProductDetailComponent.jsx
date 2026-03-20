@@ -1,12 +1,16 @@
 import axios from 'axios';
 import React, { Component } from 'react';
 import withRouter from '../utils/withRouter';
+import MyContext from '../contexts/MyContext';
 
 class ProductDetail extends Component {
+  static contextType = MyContext; // dùng global state
+
   constructor(props) {
     super(props);
     this.state = {
-      product: null
+      product: null,
+      txtQuantity: 1 // số lượng
     };
   }
 
@@ -50,17 +54,31 @@ class ProductDetail extends Component {
                       <td>{prod.category.name}</td>
                     </tr>
 
+                    {/* Quantity */}
                     <tr>
                       <td align="right">Quantity:</td>
                       <td>
-                        <input type="number" min="1" max="99" />
+                        <input
+                          type="number"
+                          min="1"
+                          max="99"
+                          value={this.state.txtQuantity}
+                          onChange={(e) =>
+                            this.setState({ txtQuantity: e.target.value })
+                          }
+                        />
                       </td>
                     </tr>
 
+                    {/* Add to cart */}
                     <tr>
                       <td></td>
                       <td>
-                        <input type="submit" value="ADD TO CART" />
+                        <input
+                          type="submit"
+                          value="ADD TO CART"
+                          onClick={(e) => this.btnAdd2CartClick(e)}
+                        />
                       </td>
                     </tr>
                   </tbody>
@@ -80,7 +98,37 @@ class ProductDetail extends Component {
     this.apiGetProduct(params.id);
   }
 
-  // apis
+  // Xử lý add to cart
+  btnAdd2CartClick(e) {
+    e.preventDefault();
+
+    const product = this.state.product;
+    const quantity = parseInt(this.state.txtQuantity);
+
+    if (quantity) {
+      const mycart = [...this.context.mycart]; // clone để tránh lỗi React
+
+      const index = mycart.findIndex(
+        (x) => x.product._id === product._id
+      );
+
+      if (index === -1) {
+        // chưa có → thêm mới
+        const newItem = { product: product, quantity: quantity };
+        mycart.push(newItem);
+      } else {
+        // đã có → cộng thêm số lượng
+        mycart[index].quantity += quantity;
+      }
+
+      this.context.setMycart(mycart);
+      alert('OK BABY!');
+    } else {
+      alert('Please input quantity');
+    }
+  }
+
+  // api
   apiGetProduct(id) {
     axios.get('/api/customer/products/' + id).then((res) => {
       const result = res.data;
